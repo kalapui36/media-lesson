@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>카드 뉴스 타당성 판단하기</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="cardnews.css">
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-in">
+  <div class="steps" id="steps">
+    <div class="step" data-s="1"><b>1</b>모둠</div>
+    <div class="step" data-s="2"><b>2</b>카드 뉴스 고르기</div>
+    <div class="step" data-s="3"><b>3</b>주장·이유·근거 찾기</div>
+    <div class="step" data-s="4"><b>4</b>타당성 판단하기</div>
+    <div class="step" data-s="5"><b>5</b>판단표 만들기</div>
+  </div>
+  <div class="whoami"><span id="netdot" class="netdot" title="연결 상태"></span><span id="whoami"></span></div>
+</div></div>
+
+<section class="screen wrap" id="s1">
+  <h1 class="title">카드 뉴스 내용의 타당성을 어떻게 판단할 수 있을까요?</h1>
+  <p class="lead">우리 모둠 번호를 누르세요.</p>
+  <div class="group-grid" id="groupGrid"></div>
+  <div class="bar"><button class="btn primary big" id="goPick" disabled>다음</button></div>
+</section>
+
+<section class="screen wrap" id="s2">
+  <h1 class="title">읽고 판단할 카드 뉴스를 한 편 고르세요</h1>
+  <p class="lead" id="pickLead">먼저 고른 모둠이 가져갑니다. 확정하면 바꿀 수 없으니 모둠에서 충분히 의논한 뒤 누르세요.</p>
+  <div class="news-grid" id="newsGrid"></div>
+  <div class="bar">
+    <button class="btn" id="b2back">이전</button>
+    <button class="btn primary big" id="goRead" disabled>이 카드 뉴스로 확정하기</button>
+    <span class="err-msg" id="pickMsg"></span>
+  </div>
+</section>
+
+<section class="screen wrap" id="s3">
+  <h1 class="title" id="readTitle"></h1>
+  <p class="lead">카드를 읽고 주장·이유·근거에 색을 칠하세요. 출처를 누르면 근거로 쓴 자료가 새 탭에서 열립니다.</p>
+  <div class="penbar">
+    <span class="lab">칠할 색</span>
+    <button class="pen on" data-pen="claim"><i></i>주장</button>
+    <button class="pen" data-pen="reason"><i></i>이유</button>
+    <button class="pen" data-pen="evidence"><i></i>근거</button>
+    <button class="pen" data-pen="erase"><i></i>지우개</button>
+    <span class="viewtoggle" style="margin-left:auto">
+      <button id="vSlide" class="on">넘겨 보기</button><button id="vGrid">펼쳐 보기</button>
+    </span>
+  </div>
+  <div class="stage">
+    <button class="navbtn prev" id="prev" aria-label="이전 카드">‹</button>
+    <div class="deck" id="deck"></div>
+    <button class="navbtn next" id="next" aria-label="다음 카드">›</button>
+  </div>
+  <div class="dots" id="dots"></div>
+  <div class="bar">
+    <button class="btn" id="b3back">다른 카드 뉴스 고르기</button>
+    <button class="btn primary big" id="goJudge">타당성 판단하러 가기</button>
+  </div>
+</section>
+
+<section class="screen wrap" id="s4">
+  <h1 class="title">타당성을 판단하고 그렇게 판단한 까닭을 쓰세요</h1>
+  <div class="jhead">
+    <span><b>◎</b> 매우 그렇다　<b>○</b> 그렇다　<b>△</b> 보통이다</span>
+    <span>다섯 항목을 모두 판단하고 까닭까지 써야 판단표를 만들 수 있습니다.</span>
+  </div>
+  <div id="jlist"></div>
+  <div class="final">
+    <h3>모둠의 최종 판단</h3>
+    <div class="hint">다섯 항목의 판단을 모아, 이 카드 뉴스의 내용이 타당한지 한 문장으로 쓰세요.</div>
+    <textarea id="finalText" placeholder="우리 모둠은 이 카드 뉴스의 내용이 ○○하다고 판단했다. 왜냐하면 ~ 때문이다."></textarea>
+  </div>
+  <div class="bar">
+    <button class="btn" id="b4back">카드 뉴스 다시 보기</button>
+    <button class="btn primary big" id="goSheet">판단표 만들기</button>
+    <span class="err-msg" id="errMsg"></span>
+  </div>
+</section>
+
+<section class="screen wrap" id="s5">
+  <h1 class="title">판단표를 완성해 제출하세요</h1>
+  <p class="lead">디자인을 고른 다음 제출하면 선생님 화면에 바로 나타납니다.</p>
+  <div class="namerow">
+    <label for="members">모둠원 이름</label>
+    <input id="members" type="text" placeholder="예) 김○○, 이○○, 박○○, 최○○" autocomplete="off">
+    <span class="hint">비워 두어도 됩니다.</span>
+  </div>
+  <div class="tpl-row" id="tplRow"></div>
+  <div class="split">
+    <div class="pane">
+      <h3 class="panetitle">우리가 고른 카드 뉴스
+        <span class="viewtoggle small" style="margin-left:auto">
+          <button id="v5Slide" class="on">한 장씩</button><button id="v5Grid">모두 보기</button>
+        </span>
+      </h3>
+      <div class="stage" id="stage5">
+        <button class="navbtn prev" id="p5">‹</button>
+        <div class="deck mini" id="deck5"></div>
+        <button class="navbtn next" id="n5">›</button>
+      </div>
+      <div class="dots" id="dots5"></div>
+    </div>
+    <div class="pane">
+      <h3 class="panetitle">우리 모둠의 판단표</h3>
+      <div id="sheetBox"><canvas id="sheet"></canvas></div>
+    </div>
+  </div>
+  <div class="bar">
+    <button class="btn" id="b5back">판단 고치기</button>
+    <button class="btn primary big" id="submitBtn">제출하기</button>
+    <span class="okmsg" id="subMsg"></span>
+    <div class="right">
+      <button class="btn" id="savePng">그림으로 저장</button>
+      <button class="btn" id="printBtn">인쇄</button>
+    </div>
+  </div>
+</section>
+
+<script src="data.js"></script>
+<script src="motifs.js"></script>
+<script src="render.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="sync.js"></script>
+<script>
+/* ---------- 저장 (막혀 있어도 멈추지 않음) ---------- */
+var LS=(function(){try{localStorage.setItem('__t','1');localStorage.removeItem('__t');return localStorage;}
+catch(e){var m={};return{getItem:function(k){return k in m?m[k]:null;},setItem:function(k,v){m[k]=String(v);},removeItem:function(k){delete m[k];}};}})();
+function load(k,d){try{var v=LS.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function save(k,v){try{LS.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* 쓸 카드 뉴스는 주소로 정한다.  ?c=1,2,3,4,6,7,9 */
+var DEFAULT_USE=[1,2,3,4,6,7,9];
+var CFG={use:DEFAULT_USE.slice()};
+(function(){try{
+  var q=new URLSearchParams(location.search).get('c');
+  if(q){var ids=q.split(',').map(function(x){return parseInt(x,10);}).filter(Boolean);if(ids.length)CFG.use=ids;}
+}catch(e){}})();
+
+var GROUPS=5, state=null;
+function blank(g){return{group:g,newsId:null,marks:{},judge:{},final:'',tpl:0,view:'slide',view5:'slide',members:'',sent:0,locked:0};}
+function gkey(g){return 'cnj.g'+g;}
+function persist(){if(state)save(gkey(state.group),state);}
+function $(s){return document.querySelector(s);}
+
+Sync.init();
+Sync.onState(function(on){
+  var d=$('#netdot');
+  d.className='netdot'+(on?' on':'');
+  d.title=on?'선생님 화면과 연결되어 있습니다':'연결되지 않았습니다. 이 기기 안에서만 저장됩니다';
+});
+
+/* ---------- 화면 ---------- */
+function show(n){
+  ['s1','s2','s3','s4','s5'].forEach(function(id){$('#'+id).classList.remove('on');});
+  $('#s'+n).classList.add('on');
+  var ss=document.querySelectorAll('#steps .step');
+  for(var i=0;i<ss.length;i++){var s=+ss[i].dataset.s;
+    ss[i].classList.toggle('on',s===n);ss[i].classList.toggle('done',s<n);}
+  $('#whoami').textContent=state&&state.group?(state.group+'모둠'):'';
+  window.scrollTo(0,0);
+}
+
+/* ---------- 1 모둠 ---------- */
+function renderGroups(){
+  var w=$('#groupGrid');w.innerHTML='';
+  for(var g=1;g<=GROUPS;g++)(function(g){
+    var saved=load(gkey(g),null), b=el('button','group-btn');
+    var d=el('div');d.appendChild(el('span',null,String(g)));d.appendChild(document.createTextNode('모둠'));
+    b.appendChild(d);
+    if(saved&&saved.newsId)b.appendChild(el('div','saved','이어서 하기'));
+    b.onclick=function(){
+      state=(saved&&saved.group)?saved:blank(g); state.group=g;
+      var mine=null, pk=allPicks();
+      for(var id in pk){ if(pk[id]===g){ mine=parseInt(id,10); break; } }
+      if(mine){
+        if(state.newsId!==mine){state.newsId=mine;state.marks={};state.judge={};state.final='';state.sent=0;}
+        state.locked=1;
+      } else if(Sync.online){
+        /* 선생님이 초기화했다 — 기기에 남은 확정을 푼다 */
+        if(state.locked||state.newsId){
+          state=blank(g);
+        }
+      }
+      persist();
+      document.querySelectorAll('.group-btn').forEach(function(x){x.classList.remove('sel');});
+      b.classList.add('sel'); $('#goPick').disabled=false;
+    };
+    w.appendChild(b);
+  })(g);
+}
+
+/* ---------- 2 카드 뉴스 고르기 (선착순) ---------- */
+function localPicks(){
+  var t={};
+  for(var g=1;g<=GROUPS;g++){var v=load(gkey(g),null);if(v&&v.newsId)t[v.newsId]=v.group;}
+  return t;
+}
+function allPicks(){
+  var p=Sync.online?Sync.picks():localPicks();
+  var out={};for(var k in p)out[parseInt(k,10)]=p[k];
+  return out;
+}
+var pending=null;
+function renderList(){
+  var w=$('#newsGrid');w.innerHTML='';
+  var taken=allPicks();
+  var locked=!!state.locked&&!!state.newsId;
+  $('#pickLead').textContent = locked
+    ? '우리 모둠이 맡은 카드 뉴스입니다. 바꾸려면 선생님께 말씀드리세요.'
+    : '먼저 고른 모둠이 가져갑니다. 확정하면 바꿀 수 없으니 모둠에서 충분히 의논한 뒤 누르세요.';
+  $('#goRead').textContent = locked ? '시작하기' : '이 카드 뉴스로 확정하기';
+  if(locked)pending=state.newsId;
+  var list=NEWS.filter(function(n){return CFG.use.indexOf(n.id)>=0;});
+  if(!list.length)list=NEWS.slice();
+  if(locked)list=list.filter(function(n){return n.id===state.newsId;});
+  list.forEach(function(n){
+    var b=el('button','news-pick');
+    paintTone(b,n);
+    var head=el('div','head');
+    var mini=motifBox(n); if(mini){mini.className='mini';head.appendChild(mini);}
+    head.appendChild(el('h3',null,n.claim));
+    var body=el('div','body');
+    var kick=el('div','kicker');kick.appendChild(el('i'));
+    kick.appendChild(document.createTextNode(n.topic||'카드 뉴스'));
+    body.appendChild(kick);
+    body.appendChild(el('div','desc','카드 4장을 읽고 주장 1개, 이유 2개, 근거 2개의 타당성을 판단합니다.'));
+    var go=el('div','go','이 카드 뉴스 고르기 →');
+    body.appendChild(go);
+    b.appendChild(head);b.appendChild(body);
+
+    var owner=taken[n.id];
+    if(owner&&owner!==state.group){
+      b.classList.add('locked');b.disabled=true;
+      head.appendChild(el('div','stamp',owner+'모둠'));
+      go.textContent=owner+'모둠이 골랐습니다';
+    } else if(locked){
+      head.appendChild(el('div','stamp','우리 모둠'));
+      b.classList.add('sel');
+      go.textContent='우리 모둠이 맡았습니다';
+      b.disabled=true;
+    } else {
+      if(pending===n.id){b.classList.add('sel');go.textContent='✓ 고름 — 아래에서 확정하세요';}
+      b.onclick=function(){ pending=n.id; $('#pickMsg').textContent=''; renderList(); };
+    }
+    w.appendChild(b);
+  });
+  $('#goRead').disabled=!pending;
+}
+Sync.onPicks(function(){ if($('#s2').classList.contains('on')&&state)renderList(); });
+
+/* ---------- 3 읽기 + 색칠 ---------- */
+var pen='claim';
+document.addEventListener('click',function(ev){
+  var p=ev.target.closest&&ev.target.closest('.pen');if(!p)return;
+  pen=p.dataset.pen;
+  document.querySelectorAll('.pen').forEach(function(x){x.classList.toggle('on',x===p);});
+});
+function renderDeck(){
+  var n=newsById(state.newsId);
+  $('#readTitle').textContent=n.claim;
+  var w=$('#deck');
+  w.className='deck skin-'+SKIN+(state.view==='slide'?' slide':'');
+  buildDeck(w,n,state.marks,function(k){
+    if(pen==='erase'||state.marks[k]===pen)delete state.marks[k];else state.marks[k]=pen;
+    persist();
+  });
+  setView(state.view||'slide');
+}
+
+/* ---------- 보기 방식 ---------- */
+function setView(mode){
+  state.view=mode;persist();
+  var deck=$('#deck'),slide=(mode==='slide');
+  deck.className='deck skin-'+SKIN+(slide?' slide':'');
+  document.querySelector('.stage').classList.toggle('one',slide);
+  $('#vSlide').classList.toggle('on',slide);
+  $('#vGrid').classList.toggle('on',!slide);
+  ['#prev','#next','#dots'].forEach(function(q){$(q).style.display=slide?'':'none';});
+  if(slide)goTo(0);else syncDots();
+}
+function curIndex(){var d=$('#deck');if(!d.children.length)return 0;
+  return Math.round(d.scrollLeft/(d.children[0].offsetWidth+26));}
+function goTo(i){var d=$('#deck');if(!d.children.length)return;
+  i=Math.max(0,Math.min(3,i));
+  if(d.scrollTo)d.scrollTo({left:i*(d.children[0].offsetWidth+26),behavior:'smooth'});else d.scrollLeft=i*(d.children[0].offsetWidth+26);syncDots(i);}
+function syncDots(i){
+  if(i==null)i=curIndex();
+  var w=$('#dots');w.innerHTML='';
+  for(var k=0;k<4;k++)(function(k){
+    var b=el('button',k===i?'on':'');
+    b.setAttribute('aria-label',(k+1)+'번 카드');
+    b.onclick=function(){goTo(k);};w.appendChild(b);
+  })(k);
+  $('#prev').disabled=(i===0);$('#next').disabled=(i===3);
+}
+$('#vSlide').onclick=function(){setView('slide');};
+$('#vGrid').onclick=function(){setView('grid');};
+$('#prev').onclick=function(){goTo(curIndex()-1);};
+$('#next').onclick=function(){goTo(curIndex()+1);};
+$('#deck').addEventListener('scroll',function(){
+  if($('#deck').classList.contains('slide'))syncDots();});
+
+/* ---------- 4 판단 ---------- */
+function renderJudge(){
+  var n=newsById(state.newsId), w=$('#jlist');w.innerHTML='';
+  KEYS.forEach(function(k){
+    var kind=KIND[k], item=el('div','jitem');item.dataset.k=k;
+    var left=el('div');
+    left.appendChild(el('span','jtag '+kind,LABEL[k]));
+    left.appendChild(el('div','jtext',textOf(n,k)));
+    if(k==='e1'||k==='e2'){
+      var s=el('div','jsrc');
+      if(n[k].href){s.appendChild(document.createTextNode('출처: '));
+        var a=el('a',null,n[k].label);a.href=n[k].href;a.target='_blank';a.rel='noopener';s.appendChild(a);
+        left.appendChild(s);}
+    }
+    var right=el('div');
+    var crit=el('div','crit');
+    CRIT[kind].forEach(function(c){crit.appendChild(el('div',null,c));});
+    right.appendChild(crit);
+    var gs=el('div','grades'), cur=state.judge[k]||{};
+    GRADES.forEach(function(g){
+      var b=el('button','grade'+(cur.g===g[0]?' on':''));
+      b.appendChild(el('em',null,g[0]));b.appendChild(document.createTextNode(g[1]));
+      b.onclick=function(){
+        state.judge[k]=state.judge[k]||{};state.judge[k].g=g[0];persist();
+        gs.querySelectorAll('.grade').forEach(function(x){x.classList.toggle('on',x===b);});
+        item.classList.remove('err');
+      };
+      gs.appendChild(b);
+    });
+    right.appendChild(gs);
+    var ta=el('textarea');ta.placeholder=ASK;ta.value=cur.r||'';
+    ta.oninput=function(){state.judge[k]=state.judge[k]||{};state.judge[k].r=ta.value;persist();};
+    right.appendChild(ta);
+    right.appendChild(el('div','egline','예시) '+FRAME));
+    item.appendChild(left);item.appendChild(right);w.appendChild(item);
+  });
+  var ft=$('#finalText');ft.value=state.final||'';
+  ft.oninput=function(){state.final=ft.value;persist();};
+  $('#errMsg').textContent='';
+}
+function checkAll(){
+  var missing=[];
+  document.querySelectorAll('.jitem').forEach(function(it){it.classList.remove('err');});
+  KEYS.forEach(function(k){
+    var j=state.judge[k]||{};
+    if(!j.g||!j.r||j.r.trim().length<5){
+      missing.push(LABEL[k]);
+      var it=document.querySelector('.jitem[data-k="'+k+'"]');if(it)it.classList.add('err');
+    }
+  });
+  if(!state.final||state.final.trim().length<5)missing.push('최종 판단');
+  return missing;
+}
+
+/* ---------- 5 판단표 ---------- */
+function renderTpl(){
+  var w=$('#tplRow');w.innerHTML='';
+  TPL.forEach(function(t,i){
+    var b=el('button','tpl'+(state.tpl===i?' on':''));
+    var s=el('div','sw');s.style.background=t.head;
+    s.style.border='2px solid '+t.accent;b.appendChild(s);
+    b.appendChild(el('span',null,t.n));
+    b.appendChild(el('span','tip',t.tip));
+    b.onclick=function(){state.tpl=i;persist();renderTpl();drawSheet($('#sheet'),state);};
+    w.appendChild(b);
+  });
+}
+function renderMini(){
+  var w=$('#deck5');
+  buildDeck(w,newsById(state.newsId),state.marks,null);
+  setView5(state.view5||'slide');
+}
+function setView5(mode){
+  state.view5=mode;persist();
+  var slide=(mode==='slide'),w=$('#deck5');
+  w.className='deck mini skin-'+SKIN+(slide?' slide one':'');
+  $('#stage5').classList.toggle('one',slide);
+  $('#v5Slide').classList.toggle('on',slide);
+  $('#v5Grid').classList.toggle('on',!slide);
+  ['#p5','#n5','#dots5'].forEach(function(q){$(q).style.display=slide?'':'none';});
+  if(slide)go5(0);
+}
+function idx5(){var d=$('#deck5');if(!d.children.length)return 0;
+  return Math.round(d.scrollLeft/(d.children[0].offsetWidth+12));}
+function go5(i){var d=$('#deck5');if(!d.children.length)return;
+  i=Math.max(0,Math.min(3,i));
+  if(d.scrollTo)d.scrollTo({left:i*(d.children[0].offsetWidth+12),behavior:'smooth'});else d.scrollLeft=i*(d.children[0].offsetWidth+12);dots5(i);}
+function dots5(i){
+  if(i==null)i=idx5();
+  var w=$('#dots5');w.innerHTML='';
+  for(var k=0;k<4;k++)(function(k){
+    var b=el('button',k===i?'on':'');b.onclick=function(){go5(k);};w.appendChild(b);
+  })(k);
+  $('#p5').disabled=(i===0);$('#n5').disabled=(i===3);
+}
+function openSheet(){
+  var mi=$('#members');mi.value=state.members||'';
+  mi.oninput=function(){state.members=mi.value;persist();drawSheet($('#sheet'),state);};
+  renderTpl();renderMini();drawSheet($('#sheet'),state);
+  $('#subMsg').textContent=state.sent?'제출했습니다. 고친 뒤 다시 제출하면 덮어씁니다.':'';
+  show(5);
+}
+
+/* ---------- 이동 ---------- */
+$('#goPick').onclick=function(){renderList();show(2);};
+$('#b2back').onclick=function(){renderGroups();show(1);};
+$('#goRead').onclick=function(){
+  if(state.locked&&state.newsId){renderDeck();show(3);return;}
+  if(!pending)return;
+  var n=newsById(pending);
+  if(!confirm('「'+n.claim+'」\n\n이 카드 뉴스로 확정합니다. 확정하면 바꿀 수 없습니다. 괜찮나요?'))return;
+  $('#goRead').disabled=true;
+  Sync.claim(pending,state.group,null,function(ok,by){
+    $('#goRead').disabled=false;
+    if(!ok){
+      $('#pickMsg').textContent=(by||'다른')+'모둠이 한발 빨랐습니다. 다른 카드 뉴스를 골라 주세요.';
+      pending=null;renderList();return;
+    }
+    state.newsId=pending;state.locked=1;state.marks={};state.judge={};state.final='';state.sent=0;
+    persist();renderDeck();show(3);
+  });
+};
+$('#b3back').onclick=function(){renderList();show(2);};
+$('#goJudge').onclick=function(){renderJudge();show(4);};
+$('#b4back').onclick=function(){renderDeck();show(3);};
+$('#goSheet').onclick=function(){
+  var m=checkAll();
+  if(m.length){$('#errMsg').textContent='아직 남았습니다 — '+m.join(', ');
+    var f=document.querySelector('.jitem.err');if(f&&f.scrollIntoView)f.scrollIntoView({block:'center'});return;}
+  $('#errMsg').textContent='';openSheet();
+};
+$('#b5back').onclick=function(){renderJudge();show(4);};
+$('#submitBtn').onclick=function(){
+  if(!Sync.online){
+    $('#subMsg').textContent='선생님 화면과 연결되지 않았습니다. 그림으로 저장해 제출하세요.';
+    $('#subMsg').className='err-msg';return;
+  }
+  $('#submitBtn').disabled=true;$('#subMsg').className='okmsg';
+  $('#subMsg').textContent='보내는 중…';
+  Sync.submit(state.group,{
+    group:state.group,newsId:state.newsId,marks:state.marks,
+    judge:state.judge,final:state.final,members:state.members,tpl:state.tpl
+  },function(ok){
+    $('#submitBtn').disabled=false;
+    if(ok){state.sent=Date.now();persist();
+      $('#subMsg').className='okmsg';
+      $('#subMsg').textContent='제출했습니다. 선생님 화면에 나타납니다.';}
+    else{$('#subMsg').className='err-msg';
+      $('#subMsg').textContent='보내지 못했습니다. 한 번 더 눌러 보세요.';}
+  });
+};
+$('#savePng').onclick=function(){
+  var a=document.createElement('a');
+  a.download='판단표_'+state.group+'모둠.png';
+  a.href=$('#sheet').toDataURL('image/png');a.click();
+};
+$('#printBtn').onclick=function(){window.print();};
+$('#v5Slide').onclick=function(){setView5('slide');};
+$('#v5Grid').onclick=function(){setView5('grid');};
+$('#p5').onclick=function(){go5(idx5()-1);};
+$('#n5').onclick=function(){go5(idx5()+1);};
+$('#deck5').addEventListener('scroll',function(){
+  if($('#deck5').classList.contains('slide'))dots5();});
+
+renderGroups();show(1);
+</script>
+</body>
+</html>

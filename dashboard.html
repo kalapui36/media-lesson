@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>모둠 판단표 — 발표 화면</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="cardnews.css">
+<style>
+  body{background:#E8EDF2;}
+  .dashhead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:22px 0 18px;}
+  .dashhead h1{font-size:27px;font-weight:800;margin:0;letter-spacing:-0.6px;}
+  .dashhead .right{margin-left:auto;display:flex;gap:9px;align-items:center;}
+
+  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media (max-width:900px){ .slots{grid-template-columns:repeat(2,1fr);} }
+  .slot{
+    background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    display:flex;flex-direction:column;text-align:left;padding:0;min-height:330px;
+    transition:transform .14s ease, box-shadow .14s ease;
+  }
+  .slot .cap{padding:14px 20px;font-weight:800;font-size:20px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:8px;}
+  .slot .inner{flex:1;display:grid;place-items:center;padding:12px;min-height:0;}
+  .slot canvas{width:100%;height:auto;border-radius:8px;box-shadow:0 1px 6px rgba(27,36,48,.12);}
+  .slot .waiting{color:#A6B2BD;font-size:17px;text-align:center;line-height:1.7;}
+  .slot .foot{padding:11px 20px 15px;font-size:16px;color:var(--ink2);border-top:1px solid #EEF2F5;}
+  .slot.filled{cursor:pointer;}
+  .slot.filled:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(27,36,48,.14);}
+  .slot.filled .cap{background:var(--accent);color:#fff;border-bottom-color:transparent;}
+  .slot .dotmark{width:9px;height:9px;border-radius:50%;background:#C9D3DC;}
+  .slot.filled .dotmark{background:#8FE3A8;}
+
+  /* 발표 화면 */
+  .viewer{position:fixed;inset:0;z-index:80;background:#EDF1F5;display:none;overflow:auto;}
+  .viewer.on{display:block;}
+  .vbar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:14px;padding:12px 22px;}
+  .vbar h2{margin:0;font-size:21px;font-weight:800;}
+  .vbar .sub{color:var(--ink2);font-size:16px;}
+  .vbar .right{margin-left:auto;display:flex;gap:9px;}
+  .vwrap{max-width:1500px;margin:0 auto;padding:18px 22px 40px;}
+  .vsplit{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:24px;align-items:start;}
+  @media (max-width:1100px){ .vsplit{grid-template-columns:1fr;} }
+  .vsplit canvas{width:100%;height:auto;background:#fff;border-radius:12px;
+    box-shadow:0 2px 12px rgba(27,36,48,.10);}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:15px;color:var(--ink2);margin:0 0 12px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:15px;height:15px;border-radius:4px;display:inline-block;}
+  .closebig{font-size:18px;padding:12px 26px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="dashhead">
+    <h1>모둠 판단표</h1>
+    <span class="netdot" id="netdot"></span>
+    <span class="footnote" id="netmsg"></span>
+
+  </div>
+  <div class="slots" id="slots"></div>
+
+
+</div>
+
+<div class="viewer" id="viewer">
+  <div class="vbar">
+    <h2 id="vTitle"></h2>
+    <span class="sub" id="vSub"></span>
+    <div class="right"><button class="btn primary closebig" id="vClose">닫기</button></div>
+  </div>
+  <div class="vwrap">
+    <div class="legend">
+      <span><i style="background:#FFDE6B"></i>주장</span>
+      <span><i style="background:#A7DEB4"></i>이유</span>
+      <span><i style="background:#9FC9F3"></i>근거</span>
+      <span>모둠이 칠한 색입니다. 출처를 누르면 새 탭에서 열립니다.</span>
+      <span class="viewtoggle small" style="margin-left:auto">
+        <button id="vwSlide" class="on">한 장씩</button><button id="vwGrid">모두 보기</button>
+      </span>
+    </div>
+    <div class="vsplit">
+      <div>
+        <div class="stage one">
+          <button class="navbtn prev" id="vPrev">‹</button>
+          <div class="deck slide skin-a" id="vDeck"></div>
+          <button class="navbtn next" id="vNext">›</button>
+        </div>
+        <div class="dots" id="vDots"></div>
+      </div>
+      <div><canvas id="vSheet"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="motifs.js"></script>
+<script src="render.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="sync.js"></script>
+<script>
+var GROUPS=5, subs={}, cur=null;
+function $(s){return document.querySelector(s);}
+
+Sync.init();
+Sync.onState(function(on){
+  $('#netdot').className='netdot'+(on?' on':'');
+  $('#netmsg').textContent=on?'연결됨':'연결되지 않았습니다. 학교망에서 파이어베이스가 막혔을 수 있습니다.';
+});
+Sync.onSubmissions(function(v){ subs=v||{}; drawSlots(); if(cur&&subs[cur])openViewer(cur); });
+var picks={};
+Sync.onPicks(function(p){ picks=p||{}; drawSlots(); });
+
+function pickOf(g){ for(var id in picks) if(picks[id]===g) return parseInt(id,10); return null; }
+
+function drawSlots(){
+  var w=$('#slots');w.innerHTML='';
+  for(var g=1;g<=GROUPS;g++)(function(g){
+    var d=subs[g], b=document.createElement('button');
+    b.className='slot'+(d?' filled':'');
+    var cap=el('div','cap');
+    cap.appendChild(el('span','dotmark'));
+    cap.appendChild(document.createTextNode(g+'모둠'));
+    b.appendChild(cap);
+    var inner=el('div','inner');
+    if(d){
+      var cv=document.createElement('canvas');
+      inner.appendChild(cv);
+      b.appendChild(inner);
+      var n=newsById(d.newsId);
+      b.appendChild(el('div','foot',n?n.claim:''));
+      drawSheet(cv,d);
+      b.onclick=function(){openViewer(g);};
+    } else {
+      inner.appendChild(el('div','waiting','아직 제출하지 않았습니다'));
+      b.appendChild(inner);
+      var pid=pickOf(g), pn=pid?newsById(pid):null;
+      b.appendChild(el('div','foot',pn?pn.claim:'카드 뉴스를 고르는 중'));
+      b.disabled=true;
+    }
+    w.appendChild(b);
+  })(g);
+}
+
+/* ---------- 발표 화면 ---------- */
+function openViewer(g){
+  var d=subs[g];if(!d)return;
+  cur=g;
+  var n=newsById(d.newsId);
+  $('#vTitle').textContent=g+'모둠';
+  $('#vSub').textContent=n?n.claim+(d.members?'  ·  '+d.members:''):'';
+  buildDeck($('#vDeck'),n,d.marks||{},null);
+  setVw(vwMode);
+  drawSheet($('#vSheet'),d);
+  $('#viewer').classList.add('on');
+  document.body.style.overflow='hidden';
+  vGo(0);
+}
+var vwMode='slide';
+function setVw(m){
+  vwMode=m;var slide=(m==='slide');
+  $('#vDeck').className='deck skin-a'+(slide?' slide':' mini');
+  document.querySelector('.vsplit .stage').classList.toggle('one',slide);
+  $('#vwSlide').classList.toggle('on',slide);
+  $('#vwGrid').classList.toggle('on',!slide);
+  ['#vPrev','#vNext','#vDots'].forEach(function(q){$(q).style.display=slide?'':'none';});
+  if(slide)vGo(0);
+}
+$('#vwSlide').onclick=function(){setVw('slide');};
+$('#vwGrid').onclick=function(){setVw('grid');};
+function vIdx(){var k=$('#vDeck');if(!k.children.length)return 0;
+  return Math.round(k.scrollLeft/(k.children[0].offsetWidth+26));}
+function vGo(i){var k=$('#vDeck');if(!k.children.length)return;
+  i=Math.max(0,Math.min(3,i));
+  if(k.scrollTo)k.scrollTo({left:i*(k.children[0].offsetWidth+26),behavior:'smooth'});else k.scrollLeft=i*(k.children[0].offsetWidth+26);vDots(i);}
+function vDots(i){
+  if(i==null)i=vIdx();
+  var w=$('#vDots');w.innerHTML='';
+  for(var k=0;k<4;k++)(function(k){
+    var b=el('button',k===i?'on':'');b.onclick=function(){vGo(k);};w.appendChild(b);
+  })(k);
+  $('#vPrev').disabled=(i===0);$('#vNext').disabled=(i===3);
+}
+$('#vPrev').onclick=function(){vGo(vIdx()-1);};
+$('#vNext').onclick=function(){vGo(vIdx()+1);};
+$('#vDeck').addEventListener('scroll',function(){vDots();});
+$('#vClose').onclick=function(){
+  cur=null;$('#viewer').classList.remove('on');document.body.style.overflow='';
+};
+document.addEventListener('keydown',function(e){
+  if(!$('#viewer').classList.contains('on'))return;
+  if(e.key==='Escape')$('#vClose').click();
+  if(e.key==='ArrowRight')vGo(vIdx()+1);
+  if(e.key==='ArrowLeft')vGo(vIdx()-1);
+});
+
+drawSlots();
+</script>
+</body>
+</html>

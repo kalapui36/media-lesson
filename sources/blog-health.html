@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>운동하고 오면 공부가 잘되는 것 같아요 : ○○의 하루하루</title>
+<link rel="stylesheet" href="source.css">
+</head>
+<body class="blog">
+<header class="blog-top">
+  <div class="in">
+    <div class="bname">○○의 하루하루</div>
+    <ul class="bmenu"><li>블로그 홈</li><li>글 목록</li><li>안부 글</li><li>이웃</li></ul>
+  </div>
+</header>
+<div class="blog-wrap">
+  <main class="post">
+    <div class="cat-line">오늘의 운동</div>
+    <h1>운동하고 오면 공부가 잘되는 것 같아요</h1>
+    <div class="byline">
+      <img class="avatar sm" src="../assets/people/person-health.jpg" alt="○○" data-initial="○">
+      <span class="who">○○</span>
+      <span class="dot">·</span>
+      <span class="when">2025. 4. 11.</span>
+    </div>
+    <p>저는 요즘 아침마다 학교 운동장을 세 바퀴씩 돌고 교실에 들어갑니다.</p>
+    <p>운동을 하고 온 날은 1교시에 하나도 안 졸립니다. 제 느낌으로는 집중하는 시간이 두 배쯤 길어진 것 같습니다.</p>
+    <p>같은 반 친구들한테도 물어봤는데 비슷하다고 했습니다. 시간을 재 본 건 아니지만요.</p>
+    <p>여러분도 아침에 조금만 뛰어 보세요. 진짜 달라집니다.</p>
+    <div class="tags"><span>#운동</span> <span>#집중력</span> <span>#건강한하루</span></div>
+    <div class="react"><span>공감 32</span><span>댓글 7</span></div>
+  </main>
+  <aside class="side">
+    <div class="pcard">
+      <img class="avatar lg" src="../assets/people/person-health.jpg" alt="○○" data-initial="○">
+      <div class="pname">○○</div>
+      <div class="pbio">달리기랑 축구를 좋아합니다</div>
+      <div class="pstat">이웃 42명</div>
+      <button type="button" class="pbtn">이웃 추가</button>
+    </div>
+    <div class="pbox">
+      <h2>카테고리</h2>
+      <ul class="cats"><li>오늘의 운동</li><li>학교 이야기</li><li>그냥 일상</li></ul>
+    </div>
+  </aside>
+</div>
+<script>
+document.querySelectorAll('img.avatar').forEach(function(img){
+  img.addEventListener('error', function(){
+    var d = document.createElement('div');
+    d.className = img.className + ' avatar-fallback';
+    d.textContent = img.dataset.initial || '?';
+    img.replaceWith(d);
+  });
+});
+</script>
+</body>
+</html>

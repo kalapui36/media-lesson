@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>모둠 판단표 (종이 백업용)</title>
+<style>
+@page{size:A4;margin:14mm;}
+body{margin:0;padding:18px;background:#fff;color:#111;
+  font-family:'Pretendard','Noto Sans KR','Malgun Gothic',sans-serif;font-size:14px;}
+.sheet{max-width:186mm;margin:0 auto;}
+.head{display:flex;align-items:flex-end;gap:16px;border-bottom:2.5px solid #1B2430;padding-bottom:8px;margin-bottom:6px;}
+h1{font-size:23px;margin:0;font-weight:800;letter-spacing:-0.5px;}
+.who{margin-left:auto;font-size:14px;}
+.who span{display:inline-block;border-bottom:1px solid #9aa;width:52px;}
+.sub{font-size:13px;color:#555;margin:0 0 12px;}
+.title-row{margin:0 0 12px;font-size:15px;}
+.title-row span{display:inline-block;border-bottom:1px solid #9aa;min-width:420px;}
+table{width:100%;border-collapse:collapse;table-layout:fixed;}
+th,td{border:1px solid #6d7880;padding:7px 9px;vertical-align:top;}
+th{background:#EDF1F4;font-size:13px;font-weight:700;}
+.c1{width:64px;}
+.c2{width:38%;}
+.c3{width:104px;text-align:center;}
+td.crit{font-size:12.5px;color:#333;line-height:1.5;background:#F8FAFB;}
+.k{font-weight:700;}
+.marks{font-size:17px;letter-spacing:7px;text-align:center;display:block;margin-top:4px;}
+.why{height:58px;}
+.final{margin-top:12px;border:1px solid #6d7880;}
+.final .lab{background:#EDF1F4;padding:6px 10px;font-weight:700;font-size:13px;border-bottom:1px solid #6d7880;}
+.final .box{height:62px;}
+.foot{margin-top:10px;font-size:12px;color:#666;display:flex;gap:16px;flex-wrap:wrap;}
+.print{margin:0 0 14px;}
+.print button{padding:9px 16px;border:1px solid #bbb;background:#fff;border-radius:8px;cursor:pointer;font-family:inherit;}
+@media print{.print{display:none;}body{padding:0;}}
+</style>
+</head>
+<body>
+<div class="print"><button onclick="window.print()">인쇄하기</button></div>
+<div class="sheet">
+  <div class="head">
+    <h1>카드 뉴스 타당성 판단표</h1>
+    <div class="who"><span></span>모둠 &nbsp; 이름 <span></span></div>
+  </div>
+  <p class="sub">판단은 ◎ 매우 그렇다 · ○ 그렇다 · △ 보통이다 가운데 하나에 표시하고, 그렇게 판단한 까닭을 씁니다.</p>
+  <p class="title-row">우리 모둠이 고른 카드 뉴스 : <span></span></p>
+
+  <table>
+    <tr>
+      <th class="c1">구분</th><th class="c2">판단 기준과 카드 뉴스의 내용</th>
+      <th class="c3">판단</th><th>그렇게 판단한 까닭</th>
+    </tr>
+    <tr>
+      <td class="k">주장</td>
+      <td class="crit">주장은 가치 있고 중요한가요?</td>
+      <td class="c3"><span class="marks">◎○△</span></td>
+      <td class="why"></td>
+    </tr>
+    <tr>
+      <td class="k">이유 ①</td>
+      <td class="crit">이유는 주장을 뒷받침하나요?</td>
+      <td class="c3"><span class="marks">◎○△</span></td>
+      <td class="why"></td>
+    </tr>
+    <tr>
+      <td class="k">근거 ①</td>
+      <td class="crit">근거는 이유를 뒷받침하나요?<br>근거로 객관적인 사실이나 정보를 활용하고 있나요?</td>
+      <td class="c3"><span class="marks">◎○△</span></td>
+      <td class="why"></td>
+    </tr>
+    <tr>
+      <td class="k">이유 ②</td>
+      <td class="crit">이유는 주장을 뒷받침하나요?</td>
+      <td class="c3"><span class="marks">◎○△</span></td>
+      <td class="why"></td>
+    </tr>
+    <tr>
+      <td class="k">근거 ②</td>
+      <td class="crit">근거는 이유를 뒷받침하나요?<br>근거로 객관적인 사실이나 정보를 활용하고 있나요?</td>
+      <td class="c3"><span class="marks">◎○△</span></td>
+      <td class="why"></td>
+    </tr>
+  </table>
+
+  <div class="final">
+    <div class="lab">모둠의 최종 판단 — 다섯 항목을 모아 이 카드 뉴스의 내용이 타당한지 한 문장으로 쓰세요.</div>
+    <div class="box"></div>
+  </div>
+
+  <div class="foot">
+    <span>문장 틀 : 나는 ○○이라고 판단했다. 왜냐하면 ~ 때문이다.</span>
+    <span>서울개봉초등학교 6학년 3반</span>
+  </div>
+</div>
+</body>
+</html>

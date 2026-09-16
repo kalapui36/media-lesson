@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>오늘도 보건실에 간 친구가 있었습니다 : □□의 학교 생활</title>
+<link rel="stylesheet" href="source.css">
+</head>
+<body class="blog">
+<header class="blog-top">
+  <div class="in">
+    <div class="bname">□□의 학교 생활</div>
+    <ul class="bmenu"><li>블로그 홈</li><li>글 목록</li><li>안부 글</li><li>이웃</li></ul>
+  </div>
+</header>
+<div class="blog-wrap">
+  <main class="post">
+    <div class="cat-line">학교 이야기</div>
+    <h1>오늘도 보건실에 간 친구가 있었습니다</h1>
+    <div class="byline">
+      <img class="avatar sm" src="../assets/people/person-safety.jpg" alt="□□" data-initial="□">
+      <span class="who">□□</span>
+      <span class="dot">·</span>
+      <span class="when">2025. 6. 3.</span>
+    </div>
+    <p>오늘도 쉬는 시간에 복도에서 부딪혀서 보건실에 간 친구가 있었습니다.</p>
+    <p>제가 보기에는 쉬는 시간마다 다쳐서 보건실에 가는 애가 꼭 한두 명은 있는 것 같습니다.</p>
+    <p>세어 본 건 아니지만 우리 반만 봐도 그렇습니다.</p>
+    <p>복도에서 뛰지만 않아도 많이 줄어들 것 같습니다.</p>
+    <div class="tags"><span>#학교안전</span> <span>#쉬는시간</span> <span>#보건실</span></div>
+    <div class="react"><span>공감 21</span><span>댓글 5</span></div>
+  </main>
+  <aside class="side">
+    <div class="pcard">
+      <img class="avatar lg" src="../assets/people/person-safety.jpg" alt="□□" data-initial="□">
+      <div class="pname">□□</div>
+      <div class="pbio">쉬는 시간이 제일 좋습니다</div>
+      <div class="pstat">이웃 19명</div>
+      <button type="button" class="pbtn">이웃 추가</button>
+    </div>
+    <div class="pbox">
+      <h2>카테고리</h2>
+      <ul class="cats"><li>학교 이야기</li><li>쉬는 시간</li><li>그냥 일상</li></ul>
+    </div>
+  </aside>
+</div>
+<script>
+document.querySelectorAll('img.avatar').forEach(function(img){
+  img.addEventListener('error', function(){
+    var d = document.createElement('div');
+    d.className = img.className + ' avatar-fallback';
+    d.textContent = img.dataset.initial || '?';
+    img.replaceWith(d);
+  });
+});
+</script>
+</body>
+</html>

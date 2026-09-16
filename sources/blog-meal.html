@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>잔반통을 보고 깜짝 놀랐습니다 : △△의 급식 일기</title>
+<link rel="stylesheet" href="source.css">
+</head>
+<body class="blog">
+<header class="blog-top">
+  <div class="in">
+    <div class="bname">△△의 급식 일기</div>
+    <ul class="bmenu"><li>블로그 홈</li><li>글 목록</li><li>안부 글</li><li>이웃</li></ul>
+  </div>
+</header>
+<div class="blog-wrap">
+  <main class="post">
+    <div class="cat-line">오늘의 급식</div>
+    <h1>잔반통을 보고 깜짝 놀랐습니다</h1>
+    <div class="byline">
+      <img class="avatar sm" src="../assets/people/person-meal.jpg" alt="△△" data-initial="△">
+      <span class="who">△△</span>
+      <span class="dot">·</span>
+      <span class="when">2025. 5. 20.</span>
+    </div>
+    <p>오늘 급식을 먹고 나오다가 잔반통을 봤는데 정말 깜짝 놀랐습니다. 통이 넘칠 정도로 가득 차 있었습니다.</p>
+    <p>저걸 다 치우려면 돈이 엄청 들 것 같습니다. 학교 한 곳에서 한 해에 천만 원이 넘게 든다고 어디선가 들은 적이 있습니다.</p>
+    <p>직접 찾아본 건 아니지만, 날마다 나오는 양을 보면 그 정도는 될 것 같습니다.</p>
+    <p>내일부터는 먹을 만큼만 받아 보려고 합니다.</p>
+    <div class="tags"><span>#급식</span> <span>#음식물쓰레기</span> <span>#잔반줄이기</span></div>
+    <div class="react"><span>공감 18</span><span>댓글 4</span></div>
+  </main>
+  <aside class="side">
+    <div class="pcard">
+      <img class="avatar lg" src="../assets/people/person-meal.jpg" alt="△△" data-initial="△">
+      <div class="pname">△△</div>
+      <div class="pbio">급식 시간이 제일 기다려집니다</div>
+      <div class="pstat">이웃 28명</div>
+      <button type="button" class="pbtn">이웃 추가</button>
+    </div>
+    <div class="pbox">
+      <h2>카테고리</h2>
+      <ul class="cats"><li>오늘의 급식</li><li>먹은 것</li><li>학교 이야기</li></ul>
+    </div>
+  </aside>
+</div>
+<script>
+document.querySelectorAll('img.avatar').forEach(function(img){
+  img.addEventListener('error', function(){
+    var d = document.createElement('div');
+    d.className = img.className + ' avatar-fallback';
+    d.textContent = img.dataset.initial || '?';
+    img.replaceWith(d);
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>교사용 — 카드 뉴스 타당성 판단 수업 준비</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body{background:#EDF0F3;}
+.note{background:#FFF8E9;border:1px solid #E8D5A6;border-radius:12px;padding:14px 18px;margin:0 0 18px;font-size:15px;color:#6B5423;max-width:900px;}
+.pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;}
+.pick{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;gap:11px;align-items:flex-start;background:#fff;cursor:pointer;}
+.pick.on{border:2px solid var(--accent);background:#F4F9FD;padding:11px 13px;}
+.pick input{width:18px;height:18px;margin-top:4px;flex:none;}
+.pick .t{font-weight:700;font-size:16px;line-height:1.45;}
+.pick .meta{font-size:13px;color:var(--ink2);margin-top:3px;}
+.pick .where{display:inline-block;background:#FDECEA;color:#A8392A;border-radius:5px;padding:1px 7px;font-size:12px;font-weight:700;margin-right:6px;}
+.pick .real{display:inline-block;background:#E7F2E9;color:#2C6B45;border-radius:5px;padding:1px 7px;font-size:12px;font-weight:700;}
+.linkbox{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:6px;}
+#link{flex:1;min-width:300px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;background:#F7F9FB;font-family:ui-monospace,Menlo,Consolas,monospace;}
+.balance{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.chip{border-radius:999px;padding:5px 13px;font-size:14px;font-weight:600;background:#EEF2F6;color:var(--ink2);}
+.chip.ok{background:#E7F2E9;color:#2C6B45;}
+.chip.no{background:#FDECEA;color:#A8392A;}
+table.key{width:100%;border-collapse:collapse;font-size:15px;}
+table.key th,table.key td{border-bottom:1px solid #EAEFF3;padding:8px 10px;text-align:left;vertical-align:top;}
+table.key th{font-size:13px;color:var(--ink2);font-weight:600;}
+.links a{display:inline-block;margin:0 14px 8px 0;color:var(--accent);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">교사용 — 수업 준비</h1>
+  <p class="lead">이 화면은 학생에게 주지 않습니다. 여기서 만든 링크만 나눠 주세요.</p>
+
+  <div class="note">
+    학생이 볼 카드 뉴스는 <b>링크로 정해집니다.</b> 아래에서 고른 편이 주소에 담기므로, 그 링크를 받은 크롬북은 모두 같은 목록을 봅니다.
+    선생님 기기에만 저장되는 방식이 아닙니다.
+  </div>
+
+  <div class="tsec" style="max-width:none">
+    <h3>1. 이번 차시에 쓸 카드 뉴스 고르기</h3>
+    <p>문제 유형이 고루 섞이도록 6~7편을 고릅니다. 빨간 표시는 그 편에서 문제가 심어진 자리입니다.</p>
+    <div class="pickgrid" id="grid"></div>
+    <div class="balance" id="balance"></div>
+  </div>
+
+  <div class="tsec" style="max-width:none">
+    <h3>2. 학생에게 줄 링크</h3>
+    <p>이 주소를 학급 게시판이나 QR로 나눠 줍니다.</p>
+    <div class="linkbox">
+      <div id="link"></div>
+      <button class="btn primary" id="copy">복사하기</button>
+      <button class="btn" id="open">학생 화면 열어 보기</button>
+    </div>
+    <div class="hint" id="copied" style="margin-top:8px"></div>
+  </div>
+
+  <div class="tsec" style="max-width:none">
+    <h3>3. 판단의 기준 — 어느 쌍에 문제가 있는가</h3>
+    <p>학생 화면에는 없습니다. 순회 지도와 발표 때 참고하세요. 문제가 있는 쌍의 짝이 되는 이유·근거는 타당하므로, 모둠이 항목마다 갈라 판단하게 됩니다.</p>
+    <table class="key"><thead><tr><th>편</th><th>문제 자리</th><th>무엇이 문제인가</th><th>출처</th></tr></thead><tbody id="key"></tbody></table>
+  </div>
+
+  <div class="tsec" style="max-width:none">
+    <h3>4. 모둠별 관리</h3>
+    <p>어느 모둠이 어떤 카드 뉴스를 확정했는지 보여 줍니다. 지우면 그 모둠은 카드 뉴스를 다시 고를 수 있고, 학생 화면에서도 곧바로 잠금이 풀립니다.</p>
+    <div class="netline"><span class="netdot" id="netdot"></span><span id="netmsg" class="hint"></span></div>
+    <div id="manage"></div>
+    <div class="bar" style="margin-top:14px">
+      <button class="btn" id="saveAll">제출된 판단표 모두 저장</button>
+      <button class="btn" id="wipeAll">다섯 모둠 모두 지우기</button>
+    </div>
+    <p class="hint" style="margin-top:8px">데이터베이스 규칙은 9월 23일 오전 9시가 지나면 잠깁니다. 평가 기록으로 남기려면 <b>수업이 끝난 뒤 그 전에</b> 판단표를 저장해 두세요.</p>
+  </div>
+
+  <div class="tsec" style="max-width:none">
+    <h3>5. 함께 쓰는 자료</h3>
+    <div class="links">
+      <a href="dashboard.html" target="_blank"><b>전자칠판용 발표 화면 열기 ↗</b></a>
+      <a href="preview.html" target="_blank">카드 뉴스 미리보기 ↗</a>
+      <a href="paper.html" target="_blank">종이 판단표 인쇄하기 ↗</a>
+      <a href="index.html" target="_blank">기본 목록으로 열기 ↗</a>
+    </div>
+    <p class="hint" style="margin-top:10px">발표 화면을 전자칠판에 띄워 두면 모둠이 제출할 때마다 빈 칸이 채워집니다. 칸을 누르면 카드 뉴스와 판단표가 함께 크게 열립니다.</p>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="motifs.js"></script>
+<script src="render.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="sync.js"></script>
+<script>
+/* 정답 성격의 정보는 이 파일에만 둔다. data.js 에는 넣지 않는다. */
+var KEY={
+ 1:{pair:'근거①',what:'출처가 개인 블로그',src:'근거② 질병관리청 — 실제'},
+ 2:{pair:'근거②',what:'출처가 개인 블로그',src:'근거① 한국재난안전뉴스 — 실제'},
+ 3:{pair:'근거②',what:'출처 표기가 없음',src:'근거① 학술 논문(KCI) — 실제'},
+ 4:{pair:'근거①',what:'이유(눈 건강)와 관련 없음',src:'둘 다 한국언론진흥재단 — 실제'},
+ 6:{pair:'근거②',what:'불법복제물 이용률은 현황일 뿐, 함부로 쓰면 안 되는 까닭이 아님',src:'둘 다 실제'},
+ 7:{pair:'근거①',what:'2012년 자료. 그 제도는 2021년에 폐지되었고 게임 이름도 지금과 다름',src:'둘 다 여성가족부 — 실제'},
+ 9:{pair:'이유①',what:'이용자가 많다는 것이 조심할 까닭은 아님',src:'둘 다 실제'},
+ 10:{pair:'근거①',what:'출처 표기가 없음',src:'근거② 학교안전공제중앙회 — 실제(PDF)'},
+ 12:{pair:'근거②',what:'2008년 기준 수치 — 16년 전 자료',src:'둘 다 실제'}
+};
+var TYPE={ '가짜 전문가 블로그':'블로그', '출처 표기 없음':'출처 없음',
+  '근거가 이유와 관련 없음':'근거 무관', '이유가 주장과 관련 약함':'이유 약함',
+  '공공기관 자료이나 오래됨':'오래됨', '공공기관 자료이나 오래됨 (실제 링크)':'오래됨', '근거가 현황일 뿐':'현황일 뿐' };
+var use=[1,2,3,4,6,7,9];
+function $(s){return document.querySelector(s);}
+
+function draw(){
+  var g=$('#grid');g.innerHTML='';
+  NEWS.forEach(function(n){
+    var k=KEY[n.id]||{};
+    var l=document.createElement('label');
+    l.className='pick'+(use.indexOf(n.id)>=0?' on':'');
+    l.innerHTML='<input type="checkbox"'+(use.indexOf(n.id)>=0?' checked':'')+'>'+
+      '<div><div class="t">'+n.id+'편. '+n.claim+'</div>'+
+      '<div class="meta"><span class="where">'+(k.pair||'')+'</span>'+(k.what||'')+'</div>'+
+      '<div class="meta">'+(n.topic||'')+' · '+(TYPE[n.kind]||n.kind)+'</div></div>';
+    l.querySelector('input').onchange=function(){
+      var i=use.indexOf(n.id);
+      if(this.checked&&i<0)use.push(n.id);
+      if(!this.checked&&i>=0)use.splice(i,1);
+      use.sort(function(a,b){return a-b;});
+      draw();
+    };
+    g.appendChild(l);
+  });
+  // 유형 균형
+  var b=$('#balance');b.innerHTML='';
+  var counts={};
+  NEWS.forEach(function(n){ if(use.indexOf(n.id)>=0){ var t=TYPE[n.kind]||n.kind; counts[t]=(counts[t]||0)+1; } });
+  ['블로그','출처 없음','근거 무관','이유 약함','오래됨'].forEach(function(t){
+    var c=counts[t]||0, s=document.createElement('span');
+    s.className='chip '+(c?'ok':'no');
+    s.textContent=t+' '+c+'편';
+    b.appendChild(s);
+  });
+  var tot=document.createElement('span');
+  tot.className='chip';tot.textContent='모두 '+use.length+'편';
+  b.appendChild(tot);
+  // 첫 쌍 / 둘째 쌍 균형
+  var first=0,second=0;
+  use.forEach(function(id){ (KEY[id]&&KEY[id].pair.indexOf('①')>=0) ? first++ : second++; });
+  var p=document.createElement('span');
+  p.className='chip';p.textContent='문제 위치 — 첫 쌍 '+first+' · 둘째 쌍 '+second;
+  b.appendChild(p);
+  // 링크
+  var base=location.href.replace(/teacher\.html.*$/,'');
+  $('#link').textContent=base+'index.html?c='+use.join(',');
+  // 정답표
+  var t=$('#key');t.innerHTML='';
+  NEWS.forEach(function(n){
+    if(use.indexOf(n.id)<0)return;
+    var k=KEY[n.id]||{},tr=document.createElement('tr');
+    tr.innerHTML='<td><b>'+n.id+'편</b></td><td>'+(k.pair||'')+'</td><td>'+(k.what||'')+'</td><td>'+(k.src||'')+'</td>';
+    t.appendChild(tr);
+  });
+}
+$('#copy').onclick=function(){
+  var txt=$('#link').textContent;
+  function done(){ $('#copied').textContent='복사했습니다. 학생에게 이 주소를 주세요.'; }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done,function(){ $('#copied').textContent='복사가 막혀 있습니다. 위 주소를 직접 선택해 복사하세요.'; });
+  } else { $('#copied').textContent='위 주소를 직접 선택해 복사하세요.'; }
+};
+$('#open').onclick=function(){ window.open($('#link').textContent,'_blank','noopener'); };
+
+/* ── 모둠별 관리 (파이어베이스) ── */
+Sync.init();
+Sync.onState(function(on){
+  $('#netdot').className='netdot'+(on?' on':'');
+  $('#netmsg').textContent=on?'연결됨':'연결되지 않았습니다. 지우기는 연결된 뒤에 됩니다.';
+});
+var picks={}, subs={};
+Sync.onPicks(function(p){ picks=p||{}; drawManage(); });
+Sync.onSubmissions(function(s){ subs=s||{}; drawManage(); });
+function pickOf(g){ for(var id in picks) if(picks[id]===g) return parseInt(id,10); return null; }
+function nameOf(id){ for(var i=0;i<NEWS.length;i++) if(NEWS[i].id===id) return NEWS[i].claim; return '알 수 없음'; }
+function drawManage(){
+  var w=$('#manage');w.innerHTML='';
+  for(var g=1;g<=5;g++)(function(g){
+    var row=document.createElement('div');row.className='mrow';
+    var id=pickOf(g);
+    var b1=document.createElement('b');b1.textContent=g+'모둠';row.appendChild(b1);
+    var t1=document.createElement('span');t1.className='mtxt'+(id?'':' dim');
+    t1.textContent=id?nameOf(id):'아직 확정하지 않았습니다';row.appendChild(t1);
+    var tag=document.createElement('span');
+    tag.className='mtag'+(subs[g]?' done':'');
+    tag.textContent=subs[g]?'제출함':'미제출';row.appendChild(tag);
+    var btn=document.createElement('button');
+    btn.className='btn mbtn';btn.textContent='지우기';
+    btn.disabled=!id&&!subs[g];
+    btn.onclick=function(){
+      if(!confirm(g+'모둠의 확정과 제출을 지웁니다. 되돌릴 수 없습니다.'))return;
+      btn.disabled=true;
+      Sync.clearGroup(g,function(ok){ if(!ok){alert('지우지 못했습니다. 연결 상태를 확인해 주세요.');btn.disabled=false;} });
+    };
+    row.appendChild(btn);
+    w.appendChild(row);
+  })(g);
+}
+$('#saveAll').onclick=function(){
+  var gs=[];for(var g=1;g<=5;g++)if(subs[g])gs.push(g);
+  if(!gs.length){alert('아직 제출한 모둠이 없습니다.');return;}
+  gs.forEach(function(g,i){
+    setTimeout(function(){
+      var cv=document.createElement('canvas');
+      drawSheet(cv,subs[g]);
+      var a=document.createElement('a');
+      a.download='판단표_'+g+'모둠.png';
+      a.href=cv.toDataURL('image/png');
+      a.click();
+    }, i*400);
+  });
+};
+$('#wipeAll').onclick=function(){
+  if(!confirm('다섯 모둠의 확정과 제출을 모두 지웁니다. 되돌릴 수 없습니다.'))return;
+  Sync.clearAll(function(ok){ if(!ok)alert('지우지 못했습니다. 연결 상태를 확인해 주세요.'); });
+};
+drawManage();
+draw();
+</script>
+</body>
+</html>
