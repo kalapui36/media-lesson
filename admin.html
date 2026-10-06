@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>학급 관리</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .tsec{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin-bottom:14px;}
+  .tsec h3{margin:0 0 4px;font-size:18px;}
+  .tsec p{margin:0 0 14px;color:var(--ink2);font-size:15px;}
+  .netline{display:flex;align-items:center;gap:4px;margin:0 0 16px;}
+  .addrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
+  .addrow input{border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:16px;font-family:inherit;width:170px;}
+
+  .cls{border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px;background:#fff;}
+  .cls .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+  .cls .nm{font-size:19px;font-weight:800;}
+  .cls .tag{font-size:13px;font-weight:700;border-radius:999px;padding:4px 11px;background:#EEF2F5;color:#8C98A4;}
+  .cls .tag.ok{background:#E3F1E8;color:#2C6B45;}
+  .cls .top .right{margin-left:auto;display:flex;gap:8px;}
+  .cls .top .right button{padding:6px 13px;font-size:14px;}
+  .lr{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F3F5F8;}
+  .lr:last-child{border-bottom:0;}
+  .lr b{width:96px;font-size:14px;color:var(--ink2);flex:none;}
+  .lr span{flex:1;font-size:14px;color:#55636F;word-break:break-all;}
+  .lr button{padding:5px 12px;font-size:13px;flex:none;}
+  .empty{color:#A6B2BD;font-size:15px;padding:10px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">학급 관리</h1>
+  <p class="lead">반을 만들고 그 반 선생님께 교사용 주소를 보냅니다. 반마다 모둠·카드 뉴스·블로그가 따로 저장됩니다.</p>
+  <div class="netline"><span class="netdot" id="netdot"></span><span id="netmsg" class="hint"></span></div>
+
+  <div class="tsec">
+    <h3>반 추가</h3>
+    <p>반 이름은 주소에 들어갑니다. <code>6-1</code> 처럼 짧게 적으세요.</p>
+    <div class="addrow">
+      <input id="newRoom" type="text" placeholder="6-1" autocomplete="off">
+      <button class="btn primary" id="add">추가</button>
+      <span class="hint" id="addMsg"></span>
+    </div>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+function $(s){return document.querySelector(s);}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+
+var BASE=location.href.replace(/admin\.html.*$/,'');
+var DEF=(typeof FB_ROOM_DEFAULT!=='undefined')?FB_ROOM_DEFAULT:'6-3';
+var rooms=[], info={}, db=null;
+
+/* 반 목록은 이 기기에 저장한다. 파이어베이스에는 반별 자료만 들어간다. */
+function loadRooms(){
+  try{ var v=localStorage.getItem('cnj.rooms'); rooms=v?JSON.parse(v):[DEF]; }
+  catch(e){ rooms=[DEF]; }
+  if(!rooms.length)rooms=[DEF];
+}
+function saveRooms(){ try{ localStorage.setItem('cnj.rooms',JSON.stringify(rooms)); }catch(e){} }
+
+/* 연결 */
+(function(){
+  if(typeof FB_ON==='undefined'||!FB_ON)return;
+  if(typeof firebase==='undefined'||!firebase.initializeApp)return;
+  try{
+    if(!firebase.apps||!firebase.apps.length)firebase.initializeApp(FB_CONFIG);
+    db=firebase.database();
+    db.ref('.info/connected').on('value',function(s){
+      var on=!!s.val();
+      $('#netdot').className='netdot'+(on?' on':'');
+      $('#netmsg').textContent=on?'연결됨':'연결되지 않았습니다.';
+    });
+  }catch(e){}
+})();
+
+function watch(r){
+  if(!db||info[r])return;
+  info[r]={cfg:null,subs:0};
+  db.ref('lesson/'+r+'/config').on('value',function(s){ info[r].cfg=s.val(); draw(); });
+  db.ref('lesson/'+r+'/submissions').on('value',function(s){ info[r].subs=Object.keys(s.val()||{}).length; draw(); });
+}
+
+function linkRow(label,url){
+  var d=el('div','lr');
+  d.appendChild(el('b',null,label));
+  d.appendChild(el('span',null,url));
+  var b=el('button','btn','복사');
+  b.onclick=function(){
+    if(navigator.clipboard&&navigator.clipboard.writeText)
+      navigator.clipboard.writeText(url).then(function(){
+        b.textContent='복사됨';setTimeout(function(){b.textContent='복사';},1400);
+      },function(){});
+  };
+  d.appendChild(b);
+  return d;
+}
+
+function draw(){
+  var w=$('#list');w.innerHTML='';
+  if(!rooms.length){ w.appendChild(el('div','empty','아직 만든 반이 없습니다.')); return; }
+  rooms.forEach(function(r){
+    var q=(r===DEF)?'':'?room='+encodeURIComponent(r);
+    var box=el('div','cls');
+    var top=el('div','top');
+    top.appendChild(el('div','nm',r+(r===DEF?' (내 반)':'')));
+    var i=info[r]||{};
+    var set=i.cfg?('모둠 '+(i.cfg.groups||5)+' · 카드 '+((i.cfg.use||[]).length||'?')+'편'):'설정 전';
+    top.appendChild(el('span','tag'+(i.cfg?' ok':''),set));
+    top.appendChild(el('span','tag'+(i.subs?' ok':''),'제출 '+(i.subs||0)));
+    var right=el('div','right');
+    var open=el('button','btn','교사용 열기');
+    open.onclick=function(){ window.open(BASE+'teacher.html'+q,'_blank','noopener'); };
+    right.appendChild(open);
+    if(r!==DEF){
+      var del=el('button','btn','목록에서 빼기');
+      del.onclick=function(){
+        if(!confirm(r+' 을 목록에서 뺍니다. 그 반에 저장된 자료는 지워지지 않습니다.'))return;
+        rooms=rooms.filter(function(x){return x!==r;});saveRooms();draw();
+      };
+      right.appendChild(del);
+    }
+    top.appendChild(right);
+    box.appendChild(top);
+    box.appendChild(linkRow('교사용',BASE+'teacher.html'+q));
+    box.appendChild(linkRow('학생용',BASE+(q?'index.html'+q:'')));
+    box.appendChild(linkRow('발표 화면',BASE+'dashboard.html'+q));
+    w.appendChild(box);
+  });
+}
+
+$('#add').onclick=function(){
+  var v=$('#newRoom').value.trim().replace(/[^0-9A-Za-z가-힣._-]/g,'');
+  if(!v){ $('#addMsg').textContent='반 이름을 적어 주세요.'; return; }
+  if(rooms.indexOf(v)>=0){ $('#addMsg').textContent='이미 있는 반입니다.'; return; }
+  rooms.push(v); saveRooms(); watch(v); draw();
+  $('#newRoom').value=''; $('#addMsg').textContent=v+' 을 추가했습니다.';
+};
+$('#newRoom').addEventListener('keydown',function(e){ if(e.key==='Enter')$('#add').click(); });
+
+loadRooms();
+rooms.forEach(watch);
+draw();
+</script>
+</body>
+</html>
